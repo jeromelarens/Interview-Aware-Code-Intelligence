@@ -7,8 +7,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState("EMAIL");
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -39,35 +38,6 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       navigate("/type");
       setLoading(false);
-
-    } catch {
-      setError("Server error");
-      setLoading(false);
-    }
-  };
-
-  const verifyOtp = async () => {
-    setError("");
-
-    try {
-      setLoading(true);
-
-      const res = await fetch(`${API_URL}/api/auth/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message);
-        setLoading(false);
-        return;
-      }
-
-      localStorage.setItem("token", data.token);
-      navigate("/type");
 
     } catch {
       setError("Server error");
@@ -142,135 +112,64 @@ export default function Login() {
         {/* Card */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl shadow-[#0F172A]/5 border border-[#F1F5F9] p-5 sm:p-8 md:p-10">
 
-          {/* Progress Steps */}
-          <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full font-sora font-bold text-xs sm:text-sm transition-all duration-300 ${step === "EMAIL" ? "bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25" : "bg-[#2563EB] text-white"
-              }`}>
-              1
-            </div>
-            <div className={`w-8 sm:w-12 h-0.5 transition-all duration-300 ${step === "OTP" ? "bg-[#2563EB]" : "bg-[#E2E8F0]"
-              }`} />
-            <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full font-sora font-bold text-xs sm:text-sm transition-all duration-300 ${step === "OTP" ? "bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25" : "bg-[#F1F5F9] text-[#94A3B8] border border-[#E2E8F0]"
-              }`}>
-              2
-            </div>
-          </div>
-
           {/* Header */}
           <div className="mb-6 sm:mb-8 text-center">
             <h1 className="font-sora font-bold text-xl sm:text-2xl md:text-3xl text-[#0F172A] mb-2">
-              {step === "EMAIL" ? "Welcome back" : "Verify your email"}
+              Welcome back
             </h1>
             <p className="text-[#64748B] text-xs sm:text-sm leading-relaxed px-1 sm:px-0">
-              {step === "EMAIL"
-                ? "Enter your email to receive a secure verification code"
-                : `We've sent a 6-digit code to ${email}`}
+              Enter your email to continue
             </p>
           </div>
 
-          {/* EMAIL STEP */}
-          {step === "EMAIL" ? (
-            <div className="space-y-4 sm:space-y-5 animate-fade-in">
+          <div className="space-y-4 sm:space-y-5 animate-fade-in">
 
-              <div>
-                <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 sm:pl-4 flex items-center pointer-events-none">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                    </svg>
-                  </div>
-                  <input
-                    type="email"
-                    placeholder="name@company.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 sm:pl-11 pr-3.5 sm:pr-4 py-3 sm:py-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] placeholder-[#94A3B8] text-sm font-medium focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all"
-                  />
+            <div>
+              <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 sm:pl-4 flex items-center pointer-events-none">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                  </svg>
                 </div>
-              </div>
-
-              <button
-                onClick={sendOtp}
-                disabled={loading}
-                className="group relative w-full py-3 sm:py-3.5 rounded-xl font-semibold text-sm bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25 hover:bg-[#1d4ed8] hover:shadow-xl hover:shadow-[#2563EB]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200 overflow-hidden"
-              >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  {loading ? (
-                    <>
-                      <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span className="truncate">Sending...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="truncate">Continue</span>
-                      <svg className="w-4 h-4 flex-shrink-0 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                    </>
-                  )}
-                </span>
-              </button>
-
-            </div>
-          ) : (
-
-            /* OTP STEP */
-            <div className="space-y-4 sm:space-y-5 animate-fade-in">
-
-              <div>
-                <label className="block text-xs font-semibold text-[#0F172A] uppercase tracking-wider mb-2">
-                  Verification Code
-                </label>
                 <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={6}
-                  placeholder="000000"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  className="otp-input w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] placeholder-[#CBD5E1] text-center text-xl sm:text-2xl font-sora font-bold focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all"
+                  type="email"
+                  placeholder="name@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 sm:pl-11 pr-3.5 sm:pr-4 py-3 sm:py-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] placeholder-[#94A3B8] text-sm font-medium focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all"
                 />
-                <p className="mt-2 text-xs text-[#64748B] text-center">
-                  Didn't receive it? <button onClick={() => setStep("EMAIL")} className="text-[#2563EB] font-semibold hover:underline">Resend code</button>
-                </p>
               </div>
-
-              <button
-                onClick={verifyOtp}
-                disabled={loading || otp.length < 6}
-                className="group relative w-full py-3 sm:py-3.5 rounded-xl font-semibold text-sm bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25 hover:bg-[#1d4ed8] hover:shadow-xl hover:shadow-[#2563EB]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200"
-              >
-                <span className="flex items-center justify-center gap-2">
-                  {loading ? (
-                    <>
-                      <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span className="truncate">Verifying...</span>
-                    </>
-                  ) : (
-                    <span className="truncate">Verify & Continue</span>
-                  )}
-                </span>
-              </button>
-
-              <button
-                onClick={() => setStep("EMAIL")}
-                className="w-full py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-[#64748B] hover:text-[#0F172A] transition-colors"
-              >
-                Back to email
-              </button>
-
             </div>
-          )}
+
+            <button
+              onClick={sendOtp}
+              disabled={loading}
+              className="group relative w-full py-3 sm:py-3.5 rounded-xl font-semibold text-sm bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25 hover:bg-[#1d4ed8] hover:shadow-xl hover:shadow-[#2563EB]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200 overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {loading ? (
+                  <>
+                    <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="truncate">Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="truncate">Continue</span>
+                    <svg className="w-4 h-4 flex-shrink-0 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </>
+                )}
+              </span>
+            </button>
+
+          </div>
 
           {/* Error */}
           {error && (
