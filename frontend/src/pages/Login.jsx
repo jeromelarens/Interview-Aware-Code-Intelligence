@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Login() {
   const navigate = useNavigate();
 
@@ -20,7 +22,7 @@ export default function Login() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/api/auth/send-otp", {
+      const res = await fetch(`${API_URL}/api/auth/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
@@ -49,7 +51,7 @@ export default function Login() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      const res = await fetch(`${API_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp })
@@ -141,17 +143,14 @@ export default function Login() {
 
           {/* Progress Steps */}
           <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full font-sora font-bold text-xs sm:text-sm transition-all duration-300 ${
-              step === "EMAIL" ? "bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25" : "bg-[#2563EB] text-white"
-            }`}>
+            <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full font-sora font-bold text-xs sm:text-sm transition-all duration-300 ${step === "EMAIL" ? "bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25" : "bg-[#2563EB] text-white"
+              }`}>
               1
             </div>
-            <div className={`w-8 sm:w-12 h-0.5 transition-all duration-300 ${
-              step === "OTP" ? "bg-[#2563EB]" : "bg-[#E2E8F0]"
-            }`} />
-            <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full font-sora font-bold text-xs sm:text-sm transition-all duration-300 ${
-              step === "OTP" ? "bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25" : "bg-[#F1F5F9] text-[#94A3B8] border border-[#E2E8F0]"
-            }`}>
+            <div className={`w-8 sm:w-12 h-0.5 transition-all duration-300 ${step === "OTP" ? "bg-[#2563EB]" : "bg-[#E2E8F0]"
+              }`} />
+            <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full font-sora font-bold text-xs sm:text-sm transition-all duration-300 ${step === "OTP" ? "bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/25" : "bg-[#F1F5F9] text-[#94A3B8] border border-[#E2E8F0]"
+              }`}>
               2
             </div>
           </div>
@@ -162,8 +161,8 @@ export default function Login() {
               {step === "EMAIL" ? "Welcome back" : "Verify your email"}
             </h1>
             <p className="text-[#64748B] text-xs sm:text-sm leading-relaxed px-1 sm:px-0">
-              {step === "EMAIL" 
-                ? "Enter your email to receive a secure verification code" 
+              {step === "EMAIL"
+                ? "Enter your email to receive a secure verification code"
                 : `We've sent a 6-digit code to ${email}`}
             </p>
           </div>
