@@ -36,7 +36,8 @@ export default function Login() {
         return;
       }
 
-      setStep("OTP");
+      localStorage.setItem("token", data.token);
+      navigate("/type");
       setLoading(false);
 
     } catch {

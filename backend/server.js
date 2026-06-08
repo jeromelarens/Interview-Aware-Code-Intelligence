@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
+
 import interviewRoutes from "./src/routes/interview.routes.js";
 import { openai } from "./src/config/openai.js"; // ✅ ADD THIS
 
@@ -30,8 +30,6 @@ mongoose.connect(process.env.MONGO_URI)
 
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
-  otp: String,
-  otpExpiry: Date,
 });
 
 const User = mongoose.model("User", userSchema);
@@ -40,15 +38,7 @@ const User = mongoose.model("User", userSchema);
    Mail Setup
 ======================== */
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+
 /* ========================
    Send OTP
 ======================== */
@@ -61,31 +51,34 @@ app.post("/api/auth/send-otp", async (req, res) => {
       return res.status(400).json({ message: "Email required" });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
-
     let user = await User.findOne({ email });
 
     if (!user) {
-      user = await User.create({ email, otp, otpExpiry });
-    } else {
-      user.otp = otp;
-      user.otpExpiry = otpExpiry;
-      await user.save();
+      user = await User.create({ email });
     }
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Your Login OTP",
-      text: `Your OTP is ${otp}`,
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    res.json({
+      success: true,
+      token,
+      user,
     });
 
-    res.json({ message: "OTP sent successfully" });
-
   } catch (error) {
-    console.error("OTP Send Error:", error);
-    res.status(500).json({ message: "Failed to send OTP" });
+    console.error("Login Error:", error);
+    res.status(500).json({
+      message: "Login failed",
+    });
   }
 });
 
@@ -93,41 +86,6 @@ app.post("/api/auth/send-otp", async (req, res) => {
    Verify OTP
 ======================== */
 
-app.post("/api/auth/verify-otp", async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-
-    if (user.otp !== otp) {
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    if (user.otpExpiry < new Date()) {
-      return res.status(400).json({ message: "OTP expired" });
-    }
-
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    user.otp = null;
-    user.otpExpiry = null;
-    await user.save();
-
-    res.json({ token });
-
-  } catch (error) {
-    console.error("Verify Error:", error);
-    res.status(500).json({ message: "OTP verification failed" });
-  }
-});
 
 /* ========================
    Interview Routes
